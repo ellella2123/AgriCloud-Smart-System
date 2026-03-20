@@ -6,4 +6,4 @@ h1 { color: #2d6a4f; font-size: 2.5rem; }
 input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
 button { width: 100%; padding: 15px; background: #40916c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 .result-area { max-width: 800px; margin: 30px auto; background: #d8f3dc; padding: 20px; border-radius: 12px; border-left: 10px solid #40916c; }
-.ai-text { font-style: italic; color: #1b4332; font-size: 1.1rem; }
+.ai-text { font-style: italic; color: #1b4332; font-size: 1.1rem; } 
