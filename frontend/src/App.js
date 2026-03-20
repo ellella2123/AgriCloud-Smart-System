@@ -4,46 +4,62 @@ import './App.css';
 function App() {
   const [formData, setFormData] = useState({ name: '', city: '', crop: '', query: '' });
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleAction = async () => {
-    const url = `/api/message?name=${formData.name}&city=${formData.city}&crop=${formData.crop}&query=${formData.query}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    setResult(data);
+    if (!formData.city || !formData.name) {
+      alert("Please enter at least your Name and City!");
+      return;
+    }
+    setLoading(true);
+    try {
+      // This sends all 4 pieces of data to your Python backend
+      const url = `/api/message?name=${formData.name}&city=${formData.city}&crop=${formData.crop}&query=${formData.query}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      setResult(data);
+    } catch (error) {
+      alert("System update in progress. Please try again in 1 minute.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="container">
       <header>
-        <h1>🌱 AgriCloud Smart Portal</h1>
-        <p>Expert Advice for Modern Farmers</p>
+        <h1>🌱 AgriCloud Smart Dashboard</h1>
+        <p>Your Personal Agricultural AI Assistant</p>
       </header>
 
       <div className="main-grid">
-        {/* Section 1: Farmer Registration */}
         <section className="card">
-          <h3>👨‍🌾 Farmer Registration</h3>
-          <input placeholder="Farmer Name" onChange={(e) => setFormData({...formData, name: e.target.value})} />
-          <input placeholder="City" onChange={(e) => setFormData({...formData, city: e.target.value})} />
-          <input placeholder="Crop (e.g. Maize, Rice)" onChange={(e) => setFormData({...formData, crop: e.target.value})} />
+          <h3>👨‍🌾 Personal & Farm Details</h3>
+          <input placeholder="Your Full Name" onChange={(e) => setFormData({...formData, name: e.target.value})} />
+          <input placeholder="Your City (for Weather Advice)" onChange={(e) => setFormData({...formData, city: e.target.value})} />
+          <input placeholder="What crop are you planting?" onChange={(e) => setFormData({...formData, crop: e.target.value})} />
         </section>
 
-        {/* Section 2: AI Chatbot */}
         <section className="card">
-          <h3>🤖 Agri-AI Assistant</h3>
-          <input placeholder="Ask me: 'How to plant?'" onChange={(e) => setFormData({...formData, query: e.target.value})} />
-          <button onClick={handleAction}>Consult AI & Register</button>
+          <h3>🤖 AI Expert Chat</h3>
+          <p style={{fontSize: '0.9rem', color: '#666'}}>Ask things like: "How do I plant maize?" or "Best time for fertilizer?"</p>
+          <input placeholder="Enter your question here..." onChange={(e) => setFormData({...formData, query: e.target.value})} />
+          <button onClick={handleAction} disabled={loading}>
+            {loading ? "Analyzing Data..." : "Get AI Advice & Weather"}
+          </button>
         </section>
       </div>
 
-      {/* Section 3: Result Display */}
       {result && (
         <div className="result-area">
-          <h2>Welcome, {result.farmer}!</h2>
+          <h2>Hello, {result.farmer}!</h2>
           <div className="info-box">
-            <p><strong>Location:</strong> {result.city}</p>
-            <p><strong>Target Crop:</strong> {result.crop}</p>
-            <p className="ai-text"><strong>AI Expert Advice:</strong> {result.ai_advice}</p>
+            <p>📍 <strong>Location:</strong> {result.city}</p>
+            <p>🌾 <strong>Crop Focus:</strong> {result.crop || "General Farming"}</p>
+            <p>🌡️ <strong>Current Temperature:</strong> {result.weather_temp}</p>
+            <div className="ai-text">
+               <p><strong>💡 AI Agricultural Advice:</strong> {result.ai_advice}</p>
+            </div>
           </div>
         </div>
       )}
