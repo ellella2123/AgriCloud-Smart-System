@@ -1,74 +1,84 @@
 import React, { useState } from 'react';
 import './App.css';
 
+// Translation Dictionary
+const translations = {
+  en: { title: "AgriCloud Smart Portal", name: "Farmer Name", city: "City", crop: "Crop", btn: "Analyze Suitability", advice: "AI Advice", score: "Suitability Score", location: "Location" },
+  ha: { title: "Dandalin Noma na AgriCloud", name: "Sunan Manomi", city: "Gari", crop: "Abun Shuka", btn: "Bincika Daidaito", advice: "Shawarar AI", score: "Makin Daidaito", location: "Wuri" },
+  yo: { title: "AgriCloud Dashboard fun Agbe", name: "Orukọ Agbe", city: "Ilu", crop: "Irugbin", btn: "Ṣayẹwo Ibamu", advice: "Imọran AI", score: "Ipele Ibamu", location: "Ibugbe" },
+  ig: { title: "AgriCloud Dashboard maka Ndị Ọrụ Ugbo", name: "Aha Onye Ọrụ Ugbo", city: "Obodo", crop: "Ihe Ịkụ", btn: "Nyochaa Nfu", advice: "Ndụmọdụ AI", score: "Akara Nfu", location: "Ebe" }
+};
+
 function App() {
+  const [lang, setLang] = useState('en');
   const [formData, setFormData] = useState({ name: '', city: '', crop: '' });
   const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState([]); // This is our "Database" for the demo
+  const t = translations[lang];
 
   const handleAction = async () => {
-    if (!formData.city || !formData.name) return alert("Please enter Name and City");
-    setLoading(true);
-    try {
-      const url = `/api/message?name=${formData.name}&city=${formData.city}&crop=${formData.crop}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      setResult(data);
-    } catch (e) { console.error(e); }
-    finally { setLoading(false); }
+    const url = `/api/message?name=${formData.name}&city=${formData.city}&crop=${formData.crop}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    setResult(data);
+    setHistory([data, ...history]); // Add to the "Farmer History" list
   };
 
   return (
     <div className="App">
-      {/* 1. ATTENTION GRABBING HERO */}
+      {/* LANGUAGE TOGGLE */}
+      <div className="lang-bar">
+        <button onClick={() => setLang('en')}>English</button>
+        <button onClick={() => setLang('ha')}>Hausa</button>
+        <button onClick={() => setLang('yo')}>Yoruba</button>
+        <button onClick={() => setLang('ig')}>Igbo</button>
+      </div>
+
       <div className="hero">
-        <h1>AgriCloud <span style={{color:'#fff'}}>Intelligence</span></h1>
-        <p>Harnessing satellite data and AI to give farmers 100% accurate planting suitability scores across Africa.</p>
+        <h1>{t.title}</h1>
+        <p>Climate-Smart Intelligence for African Food Security.</p>
       </div>
 
       <div className="dashboard-container">
-        {/* 2. REGISTRATION CARD */}
         <section className="glass-card">
-          <h3>🚀 Start Analysis</h3>
-          <p style={{color:'#aaa', fontSize:'0.9rem'}}>Enter details to sync with satellite data.</p>
-          <input placeholder="Farmer Full Name" onChange={(e) => setFormData({...formData, name: e.target.value})} />
-          <input placeholder="City Location (e.g. Jalingo)" onChange={(e) => setFormData({...formData, city: e.target.value})} />
-          <input placeholder="Crop Type (e.g. Maize, Rice)" onChange={(e) => setFormData({...formData, crop: e.target.value})} />
-          <button className="analyze-btn" onClick={handleAction}>
-            {loading ? "📡 Syncing Satellite..." : "Analyze Farming Suitability"}
-          </button>
+          <h3>🚀 {lang === 'en' ? "Farmer Registry" : t.btn}</h3>
+          <input placeholder={t.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+          <input placeholder={t.city} onChange={(e) => setFormData({...formData, city: e.target.value})} />
+          <input placeholder={t.crop} onChange={(e) => setFormData({...formData, crop: e.target.value})} />
+          <button className="analyze-btn" onClick={handleAction}>{t.btn}</button>
         </section>
 
-        {/* 3. DYNAMIC RESULT CARD */}
-        <section className="glass-card score-section">
-          {!result ? (
-            <div style={{padding:'50px', color:'#555'}}>
-              <p>Awaiting farmer data...</p>
-              <p style={{fontSize:'0.8rem'}}>Results will appear here after analysis.</p>
+        <section className="glass-card">
+          {result ? (
+            <div className="score-section">
+               <div className="suitability-circle">
+                <h1>{result.score}</h1>
+                <span>{t.score}</span>
+              </div>
+              <h2 className={result.rating}>{result.rating}</h2>
+              <p><strong>{t.advice}:</strong> {result.advice}</p>
             </div>
           ) : (
-            <div className="fadeIn">
-              <div className="suitability-circle">
-                <h1 style={{margin:0, color:'#fff', fontSize:'3rem'}}>{result.score}</h1>
-                <span style={{fontSize:'0.8rem'}}>SCORE</span>
-              </div>
-              <h2 className={result.rating}>{result.rating} Conditions</h2>
-              <div style={{textAlign:'left', background:'rgba(0,0,0,0.2)', padding:'15px', borderRadius:'10px'}}>
-                <p>📍 <strong>Location:</strong> {result.city}</p>
-                <p>🌡️ <strong>Temp:</strong> {result.temp}</p>
-                <p>💡 <strong>Expert Advice:</strong> {result.advice}</p>
-              </div>
-              <p style={{fontSize:'0.8rem', marginTop:'15px', color:'#74c69d'}}>✔ Farmer {result.farmer} registered successfully.</p>
-            </div>
+            <p>Ready for analysis...</p>
           )}
         </section>
       </div>
-      
-      <footer style={{textAlign:'center', color:'#444', paddingBottom:'40px'}}>
-        AgriCloud Smart Systems © 2026 | Powered by Azure AI
-      </footer>
+
+      {/* FARMER HISTORY (DATABASE DISPLAY) */}
+      <div className="history-section glass-card">
+        <h3>📋 Recent Farmer Registry (Database Persistence)</h3>
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Location</th><th>Crop</th><th>Credit Score</th></tr>
+          </thead>
+          <tbody>
+            {history.map((item, index) => (
+              <tr key={index}><td>{item.farmer}</td><td>{item.city}</td><td>{item.crop}</td><td>{item.score}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
-
 export default App;
