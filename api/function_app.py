@@ -12,7 +12,7 @@ def message(req: func.HttpRequest) -> func.HttpResponse:
     
     # 1. FETCH REAL WEATHER
     # Replace the 'PASTE_KEY_HERE' with your key from Step 1
-    api_key = "PASTE_YOUR_OPENWEATHER_KEY_HERE"
+    api_key = "b2b8945ab53a56945813d94fa379ed13"
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
     
     try:
