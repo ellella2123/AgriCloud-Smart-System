@@ -11,7 +11,7 @@ def message(req: func.HttpRequest) -> func.HttpResponse:
     crop = req.params.get('crop', 'General') # This captures the crop
     
     # FETCH REAL WEATHER
-    api_key = "YOUR_OPENWEATHER_KEY" # Make sure your real key is here
+    api_key = "b2b8945ab53a56945813d94fa379ed13" # Make sure your real key is here
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
     
     try:
