@@ -3,7 +3,7 @@
 
 ---
 
-## 🔗 [LIVE DEMO LINK: View the App Here! https://calm-forest-0de8d751e.4.azurestaticapps.net
+## 🔗 [LIVE DEMO LINK: View the App Here!]> https://calm-forest-0de8d751e.4.azurestaticapps.net
 
 ---
 
